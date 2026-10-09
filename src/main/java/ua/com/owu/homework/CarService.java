@@ -1,4 +1,4 @@
-package ua.com.owu.homework.hw8;
+package ua.com.owu.homework;
 
 import org.springframework.stereotype.Service;
 

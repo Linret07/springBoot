@@ -1,4 +1,4 @@
-package ua.com.owu.homework.hw8;
+package ua.com.owu.homework;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
