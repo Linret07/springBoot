@@ -13,15 +13,15 @@ public class CarServiceHw9 {
         this.carRepository = carRepository;
     }
 
-    public List<CarHw9> findAll() {
+    public List<Car> findAll() {
         return carRepository.findAll();
     }
 
-    public Optional<CarHw9> findById(Long id) {
+    public Optional<Car> findById(Long id) {
         return carRepository.findById(id);
     }
 
-    public CarHw9 save(CarHw9 car) {
+    public Car save(Car car) {
         return carRepository.save(car);
     }
 
@@ -33,11 +33,11 @@ public class CarServiceHw9 {
         return true;
     }
 
-    public List<CarHw9> findByPower(int power) {
+    public List<Car> findByPower(int power) {
         return carRepository.findByPower(power);
     }
 
-    public List<CarHw9> findByProducer(String producer) {
+    public List<Car> findByProducer(String producer) {
         return carRepository.findByProducerIgnoreCase(producer);
     }
 }

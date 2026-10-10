@@ -1,12 +1,12 @@
 package ua.com.owu.homework;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
-public class CarHw9 {
+public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,10 +15,10 @@ public class CarHw9 {
     private String producer;
     private int power;
 
-    public CarHw9() {
+    public Car() {
     }
 
-    public CarHw9(String model, String producer, int power) {
+    public Car(String model, String producer, int power) {
         this.model = model;
         this.producer = producer;
         this.power = power;

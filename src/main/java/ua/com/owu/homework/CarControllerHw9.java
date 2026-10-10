@@ -16,19 +16,19 @@ public class CarControllerHw9 {
     }
 
     @GetMapping
-    public List<CarHw9> getAll() {
+    public List<Car> getAll() {
         return carService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CarHw9> getById(@PathVariable("id") Long id) {
+    public ResponseEntity<Car> getById(@PathVariable("id") Long id) {
         return carService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<CarHw9> create(@RequestBody CarHw9 car) {
+    public ResponseEntity<Car> create(@RequestBody Car car) {
         return ResponseEntity.status(HttpStatus.CREATED).body(carService.save(car));
     }
 
@@ -40,12 +40,12 @@ public class CarControllerHw9 {
     }
 
     @GetMapping("/power/{value}")
-    public List<CarHw9> getByPower(@PathVariable("value") int value) {
+    public List<Car> getByPower(@PathVariable("value") int value) {
         return carService.findByPower(value);
     }
 
     @GetMapping("/producer/{value}")
-    public List<CarHw9> getByProducer(@PathVariable("value") String value) {
+    public List<Car> getByProducer(@PathVariable("value") String value) {
         return carService.findByProducer(value);
     }
 }
