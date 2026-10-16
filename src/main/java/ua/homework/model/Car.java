@@ -1,6 +1,8 @@
-package ua.homework;
+package ua.homework.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import ua.homework.config.Views;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -39,35 +41,12 @@ public class Car {
         this.power = power;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public String getProducer() {
-        return producer;
-    }
-
-    public void setProducer(String producer) {
-        this.producer = producer;
-    }
-
-    public Integer getPower() {
-        return power;
-    }
-
-    public void setPower(Integer power) {
-        this.power = power;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getModel() { return model; }
+    public void setModel(String model) { this.model = model; }
+    public String getProducer() { return producer; }
+    public void setProducer(String producer) { this.producer = producer; }
+    public Integer getPower() { return power; }
+    public void setPower(Integer power) { this.power = power; }
 }

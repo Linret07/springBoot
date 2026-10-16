@@ -10,10 +10,10 @@
     <relativePath/>
   </parent>
 
-  <groupId>org.example</groupId>
-  <artifactId>springIntro</artifactId>
+  <groupId>ua.homework</groupId>
+  <artifactId>hw10</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>springIntro</name>
+  <name>hw10</name>
   <description>Homework 10</description>
 
   <properties>

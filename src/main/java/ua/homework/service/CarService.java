@@ -1,4 +1,6 @@
-package ua.homework;
+package ua.homework.service;
+
+import ua.homework.model.Car;
 
 import java.util.List;
 import java.util.Optional;
