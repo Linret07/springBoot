@@ -1,4 +1,4 @@
-package ua.com.owu.homework.car;
+package ua.com.owu.homework.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document("cars")
 public class Car {
     @Id
-    private String id;
+    private Long id;
     private String model;
     private String producer;
     private Integer power;
@@ -22,8 +22,8 @@ public class Car {
         this.power = power;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getModel() { return model; }
     public void setModel(String model) { this.model = model; }
     public String getProducer() { return producer; }
