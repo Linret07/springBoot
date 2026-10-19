@@ -1,4 +1,4 @@
-package ua.example;
+package ua.com.owu.homework;
 
 /**
  * Hello world!
