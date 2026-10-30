@@ -56,9 +56,9 @@ public class CarService {
         car.setModel(update.getModel());
         car.setProducer(update.getProducer());
         car.setPower(update.getPower());
-        if (update.getPhoto() != null) {
-            car.setPhoto(update.getPhoto());
-            car.setPhotoName(update.getPhotoName());
+        if (update.getPhotoFileName() != null) {
+            car.setPhotoFileName(update.getPhotoFileName());
+            car.setPhotoOriginalName(update.getPhotoOriginalName());
             car.setPhotoContentType(update.getPhotoContentType());
         }
         return save(car);

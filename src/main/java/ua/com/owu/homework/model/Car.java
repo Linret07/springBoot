@@ -10,9 +10,9 @@ public class Car {
     private String model;
     private String producer;
     private Integer power;
-    private byte[] photo;
+    private String photoFileName;
     private String photoContentType;
-    private String photoName;
+    private String photoOriginalName;
 
     public Car() { }
 
@@ -30,10 +30,10 @@ public class Car {
     public void setProducer(String producer) { this.producer = producer; }
     public Integer getPower() { return power; }
     public void setPower(Integer power) { this.power = power; }
-    public byte[] getPhoto() { return photo; }
-    public void setPhoto(byte[] photo) { this.photo = photo; }
     public String getPhotoContentType() { return photoContentType; }
     public void setPhotoContentType(String photoContentType) { this.photoContentType = photoContentType; }
-    public String getPhotoName() { return photoName; }
-    public void setPhotoName(String photoName) { this.photoName = photoName; }
+    public String getPhotoFileName() { return photoFileName; }
+    public void setPhotoFileName(String photoFileName) { this.photoFileName = photoFileName; }
+    public String getPhotoOriginalName() { return photoOriginalName; }
+    public void setPhotoOriginalName(String photoOriginalName) { this.photoOriginalName = photoOriginalName; }
 }
