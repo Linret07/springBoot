@@ -11,6 +11,7 @@ public class Car {
     private String producer;
     private Integer power;
     private String photoFileName;
+    private String photoUrl;
     private String photoContentType;
     private String photoOriginalName;
 
@@ -34,6 +35,8 @@ public class Car {
     public void setPhotoContentType(String photoContentType) { this.photoContentType = photoContentType; }
     public String getPhotoFileName() { return photoFileName; }
     public void setPhotoFileName(String photoFileName) { this.photoFileName = photoFileName; }
+    public String getPhotoUrl() { return photoUrl; }
+    public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
     public String getPhotoOriginalName() { return photoOriginalName; }
     public void setPhotoOriginalName(String photoOriginalName) { this.photoOriginalName = photoOriginalName; }
 }

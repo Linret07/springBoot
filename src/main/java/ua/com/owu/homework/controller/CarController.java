@@ -141,6 +141,7 @@ public class CarController {
             Files.copy(photo.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
 
             car.setPhotoFileName(storedFileName);
+            car.setPhotoUrl("/uploads/" + storedFileName);
             car.setPhotoOriginalName(photo.getOriginalFilename());
             car.setPhotoContentType(photo.getContentType());
         }
