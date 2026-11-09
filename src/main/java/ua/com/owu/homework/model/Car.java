@@ -2,17 +2,39 @@ package ua.com.owu.homework.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import com.fasterxml.jackson.annotation.JsonView;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 @Document("cars")
 public class Car {
+    public static class Views {
+        public static class Public { }
+        public static class Details extends Public { }
+    }
+
     @Id
+    @JsonView(Views.Details.class)
     private Long id;
+    @JsonView(Views.Public.class)
+    @NotBlank
     private String model;
+    @NotBlank
+    @JsonView(Views.Public.class)
     private String producer;
+    @JsonView(Views.Public.class)
+    @NotNull
+    @Positive
     private Integer power;
+    @JsonView(Views.Details.class)
     private String photoFileName;
+    @JsonView(Views.Details.class)
     private String photoUrl;
+    @JsonView(Views.Details.class)
     private String photoContentType;
+    @JsonView(Views.Details.class)
     private String photoOriginalName;
 
     public Car() { }

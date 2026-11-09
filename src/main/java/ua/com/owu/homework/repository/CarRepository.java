@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface CarRepository extends MongoRepository<Car, Long> {
     List<Car> findByPowerLessThan(Integer power);
+    List<Car> findByPower(Integer power);
+    List<Car> findByProducerIgnoreCase(String producer);
 }
