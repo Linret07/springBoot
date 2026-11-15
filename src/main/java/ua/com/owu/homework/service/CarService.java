@@ -1,60 +1,125 @@
 package ua.com.owu.homework.service;
 
-import java.util.List;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import ua.com.owu.homework.model.Car;
 import ua.com.owu.homework.repository.CarRepository;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.UUID;
+
 @Service
 public class CarService {
-    private static final Logger log = LoggerFactory.getLogger(CarService.class);
     private final CarRepository repository;
-    private final JavaMailSender mailSender;
-    private final String mailTo;
-    private final String mailFrom;
-    public CarService(CarRepository repository, JavaMailSender mailSender,
-                      @Value("${app.mail.to:owner@example.com}") String mailTo,
-                      @Value("${app.mail.from:hw12@localhost}") String mailFrom) {
-        this.repository = repository; this.mailSender = mailSender; this.mailTo = mailTo; this.mailFrom = mailFrom;
+    private final MailService mailService;
+    private final IdSequenceService idSequenceService;
+    private final Path uploadDirectory;
+
+    public CarService(CarRepository repository, MailService mailService,
+                      IdSequenceService idSequenceService,
+                      @Value("${app.upload-dir:uploads}") String uploadDirectory) {
+        this.repository = repository;
+        this.mailService = mailService;
+        this.idSequenceService = idSequenceService;
+        this.uploadDirectory = Paths.get(uploadDirectory).toAbsolutePath().normalize();
+        try { Files.createDirectories(this.uploadDirectory); }
+        catch (IOException exception) { throw new IllegalStateException("Cannot create upload directory", exception); }
     }
+
     public List<Car> findAll() { return repository.findAll(); }
-    public Car findById(Long id) { return repository.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Car not found")); }
-    public Car save(Car car) {
-        if (car.getId() == null) {
-            car.setId(repository.findAll().stream().map(Car::getId)
-                    .filter(java.util.Objects::nonNull).max(Long::compareTo).orElse(0L) + 1);
-        }
-        Car saved = repository.save(car); notify("Car saved", saved); return saved;
+    public List<Car> findByPower(Integer power) { return repository.findByPower(power); }
+    public List<Car> findByProducer(String producer) { return repository.findByProducerIgnoreCase(producer); }
+
+    public Car findById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Car not found"));
     }
-    public Car update(Long id, Car update) {
+
+    public Photo getPhoto(Long id) {
         Car car = findById(id);
-        car.setModel(update.getModel()); car.setProducer(update.getProducer()); car.setPower(update.getPower());
-        if (update.getPhoto() != null) {
-            car.setPhoto(update.getPhoto()); car.setPhotoName(update.getPhotoName());
-            car.setPhotoContentType(update.getPhotoContentType());
+        if (car.getPhotoFileName() == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Photo not found");
+        try {
+            Path path = uploadDirectory.resolve(car.getPhotoFileName()).normalize();
+            if (!path.startsWith(uploadDirectory)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid photo path");
+            Resource resource = new UrlResource(path.toUri());
+            if (!resource.exists() || !resource.isReadable()) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Photo not found");
+            MediaType contentType = car.getPhotoContentType() == null
+                    ? MediaType.APPLICATION_OCTET_STREAM : MediaType.parseMediaType(car.getPhotoContentType());
+            return new Photo(resource, contentType);
+        } catch (MalformedURLException exception) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Photo not found", exception);
         }
-        return save(car);
     }
-    public void delete(Long id) { Car car = findById(id); repository.delete(car); notify("Car deleted", car); }
+
+    public Car save(Car car, MultipartFile photo) throws IOException {
+        car.setId(idSequenceService.nextCarId());
+        attachPhoto(car, photo);
+        Car saved = repository.save(car);
+        mailService.sendCarNotification("Car saved", saved);
+        return saved;
+    }
+
+    public Car update(Long id, Car update, MultipartFile photo) throws IOException {
+        Car car = findById(id);
+        String oldPhotoFileName = car.getPhotoFileName();
+        car.setModel(update.getModel()); car.setProducer(update.getProducer()); car.setPower(update.getPower());
+        if (photo != null && !photo.isEmpty()) attachPhoto(car, photo);
+        Car saved = repository.save(car);
+        if (photo != null && !photo.isEmpty() && oldPhotoFileName != null && !oldPhotoFileName.equals(car.getPhotoFileName())) deletePhotoFile(oldPhotoFileName);
+        mailService.sendCarNotification("Car updated", saved);
+        return saved;
+    }
+
+    public void delete(Long id) {
+        Car car = findById(id); repository.delete(car); deletePhotoFile(car.getPhotoFileName());
+        mailService.sendCarNotification("Car deleted", car);
+    }
+
     public int deleteCarsWithPowerBelow(Integer power) {
         List<Car> cars = repository.findByPowerLessThan(power); repository.deleteAll(cars);
-        cars.forEach(car -> notify("Car deleted", car)); return cars.size();
+        cars.forEach(car -> { deletePhotoFile(car.getPhotoFileName()); mailService.sendCarNotification("Car deleted", car); });
+        return cars.size();
     }
-    private void notify(String subject, Car car) {
-        SimpleMailMessage message = new SimpleMailMessage(); message.setFrom(mailFrom); message.setTo(mailTo);
-        message.setSubject(subject); message.setText("id: " + car.getId() + "\nmodel: " + car.getModel()
-                + "\nproducer: " + car.getProducer() + "\npower: " + car.getPower());
-        try { mailSender.send(message); } catch (MailException exception) {
-            log.warn("Car operation succeeded, but notification email could not be sent", exception);
-        }
+
+    private void attachPhoto(Car car, MultipartFile photo) throws IOException {
+        if (photo == null || photo.isEmpty()) return;
+        String fileName = UUID.randomUUID() + getExtension(photo.getOriginalFilename());
+        Path target = uploadDirectory.resolve(fileName).normalize();
+        if (!target.startsWith(uploadDirectory)) throw new IOException("Invalid photo file path");
+        Files.copy(photo.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+        car.setPhotoFileName(fileName); car.setPhotoUrl("/uploads/" + fileName);
+        car.setPhotoOriginalName(photo.getOriginalFilename()); car.setPhotoContentType(photo.getContentType());
+    }
+
+    private void deletePhotoFile(String fileName) {
+        if (fileName == null) return;
+        try {
+            Path path = uploadDirectory.resolve(fileName).normalize();
+            if (path.startsWith(uploadDirectory)) Files.deleteIfExists(path);
+        } catch (IOException exception) { throw new IllegalStateException("Could not delete photo file", exception); }
+    }
+
+    private String getExtension(String originalFilename) {
+        if (originalFilename == null) return "";
+        int dot = originalFilename.lastIndexOf('.'); return dot >= 0 ? originalFilename.substring(dot) : "";
+    }
+
+    public static class Photo {
+        private final Resource resource; private final MediaType contentType;
+        public Photo(Resource resource, MediaType contentType) { this.resource = resource; this.contentType = contentType; }
+        public Resource getResource() { return resource; }
+        public MediaType getContentType() { return contentType; }
     }
 }

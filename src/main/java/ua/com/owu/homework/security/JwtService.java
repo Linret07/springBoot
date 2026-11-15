@@ -36,6 +36,7 @@ public class JwtService {
                 .setExpiration(new Date(now.getTime() + lifetime)).signWith(signingKey, SignatureAlgorithm.HS256).compact();
     }
     public String username(String token) { return claim(token, Claims::getSubject); }
+    public boolean isAccessToken(String token) { return "access".equals(claim(token, c -> c.get("type", String.class))); }
     public boolean isRefreshToken(String token) { return "refresh".equals(claim(token, c -> c.get("type", String.class))); }
     public boolean valid(String token, UserDetails user) {
         try { return username(token).equals(user.getUsername()) && !expired(token); } catch (RuntimeException e) { return false; }

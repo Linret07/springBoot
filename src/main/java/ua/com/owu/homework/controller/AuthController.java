@@ -32,12 +32,11 @@ public class AuthController {
             if (token == null || !jwt.isRefreshToken(token)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             UserDetails user = users.loadUserByUsername(jwt.username(token));
             if (!jwt.valid(token, user)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            Map<String, String> result = new HashMap<>(); result.put("accessToken", jwt.accessToken(user));
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok(tokens(user));
         } catch (RuntimeException exception) { return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); }
     }
     private Map<String, String> tokens(UserDetails user) {
-        Map<String, String> result = new HashMap<>(); result.put("accessToken", jwt.accessToken(user));
+        Map<String, String> result = new HashMap<>(); result.put("token", jwt.accessToken(user));
         result.put("refreshToken", jwt.refreshToken(user)); return result;
     }
     public static class Credentials {
