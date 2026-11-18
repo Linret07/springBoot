@@ -26,11 +26,11 @@ public class CarController {
 
     public CarController(CarService service) { this.service = service; }
 
-    @GetMapping @JsonView(Car.Views.Details.class)
+    @GetMapping @JsonView(Car.Views.List.class)
     public ResponseEntity<List<Car>> getCars() { return ResponseEntity.ok(service.findAll()); }
-    @GetMapping("/power/{power}") @JsonView(Car.Views.Details.class)
+    @GetMapping("/power/{power}") @JsonView(Car.Views.List.class)
     public ResponseEntity<List<Car>> getByPower(@PathVariable @Positive Integer power) { return ResponseEntity.ok(service.findByPower(power)); }
-    @GetMapping("/producer/{producer}") @JsonView(Car.Views.Details.class)
+    @GetMapping("/producer/{producer}") @JsonView(Car.Views.List.class)
     public ResponseEntity<List<Car>> getByProducer(@PathVariable @NotBlank String producer) { return ResponseEntity.ok(service.findByProducer(producer)); }
     @GetMapping("/{id}") @JsonView(Car.Views.Details.class)
     public ResponseEntity<Car> getCar(@PathVariable Long id) { return ResponseEntity.ok(service.findById(id)); }

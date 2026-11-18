@@ -11,30 +11,26 @@ import javax.validation.constraints.Positive;
 @Document("cars")
 public class Car {
     public static class Views {
-        public static class Public { }
-        public static class Details extends Public { }
+        public static class List { }
+        public static class Details extends List { }
     }
 
     @Id
     @JsonView(Views.Details.class)
     private Long id;
-    @JsonView(Views.Public.class)
+    @JsonView(Views.List.class)
     @NotBlank
     private String model;
     @NotBlank
-    @JsonView(Views.Public.class)
+    @JsonView(Views.List.class)
     private String producer;
-    @JsonView(Views.Public.class)
+    @JsonView(Views.Details.class)
     @NotNull
     @Positive
     private Integer power;
-    @JsonView(Views.Details.class)
     private String photoFileName;
-    @JsonView(Views.Details.class)
     private String photoUrl;
-    @JsonView(Views.Details.class)
     private String photoContentType;
-    @JsonView(Views.Details.class)
     private String photoOriginalName;
 
     public Car() { }
